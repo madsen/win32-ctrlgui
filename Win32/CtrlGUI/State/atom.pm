@@ -18,18 +18,27 @@ use vars qw($VERSION @ISA);
 
 @ISA = ('Win32::CtrlGUI::State');
 
-$VERSION='0.10';
+$VERSION='0.11';
+
+sub _new {
+  my $class = shift;
+
+  my $self = $class->SUPER::_new(@_);
+
+  if (ref ($self->{criteria}) eq 'ARRAY') {
+    $self->{criteria} = Win32::CtrlGUI::Criteria->new(@{$self->{criteria}});
+  }
+
+  return $self;
+}
 
 sub is_recognized {
   my $self = shift;
 
-  my $state = $self->state;
-  if ($state eq 'init' or $state eq 'srch') {
-    if ($state eq 'init') {
+  if ($self->state =~ /^init|srch$/) {
+    if ($self->state eq 'init') {
       $self->{state} = 'srch';
-      if ($self->{timeout}) {
-        $self->{end_time} = Win32::GetTickCount()+$self->{timeout}*1000;
-      }
+      $self->{timeout} and $self->{end_time} = Win32::GetTickCount()+$self->{timeout}*1000;
     }
     my $rcog = $self->{criteria}->is_recognized;
     if ($rcog) {
@@ -39,6 +48,7 @@ sub is_recognized {
       $self->debug_print(1, "Criteria $self->{criteria} met.");
     } else {
       if ($self->{end_time} && $self->{end_time} < Win32::GetTickCount()) {
+        $self->debug_print(1, "Criteria $self->{criteria} was timed out.");
         $self->{state} = 'fail';
         return 1;
       }
@@ -49,24 +59,15 @@ sub is_recognized {
   }
 }
 
-sub wait_recognized {
-  my $self = shift;
-
-  $self->{state} ne 'rcog' and $self->debug_print(1, "Waiting for criteria $self->{criteria}.");
-  until ($self->is_recognized) {
-    Win32::Sleep($self->wait_intvl);
-  }
-}
-
 sub do_action_step {
   my $self = shift;
 
   if ($self->state eq 'rcog') {
     $self->{state} = 'actn';
-    my $wait_time = $self->{rcog_time} + $self->action_delay * 1000 -Win32::GetTickCount();
-    $wait_time > 0 and $self->debug_print(1, "Looping for ".($wait_time/1000)." seconds before executing action.");
+    my $wait_time = $self->{rcog_time}/1000 + $self->action_delay - Win32::GetTickCount()/1000;
+    $wait_time > 0 and $self->debug_print(1, "Looping for $wait_time seconds before executing action.");
   }
-  $self->state eq 'actn' or return 0;
+  $self->state eq 'actn' or return;
 
   if ($self->{rcog_time} + $self->action_delay * 1000 <= Win32::GetTickCount()) {
     if (ref $self->{action} eq 'CODE') {
@@ -78,32 +79,31 @@ sub do_action_step {
     }
     $self->debug_print(1, "");
     $self->{state} = 'done';
-    return 0;
   }
-  return 1;
 }
 
 sub wait_action {
   my $self = shift;
 
-  my $state = $self->state;
-  $state eq 'actn' or $state eq 'rcog' or return 0;
+  $self->state =~ /^actn|rcog$/ or return 0;
+
   my $wait_time = $self->{rcog_time} + $self->action_delay * 1000 - Win32::GetTickCount();
   if ($wait_time > 0) {
     $self->debug_print(1, "Sleeping for ".($wait_time/1000)." seconds before executing action.");
     Win32::Sleep($wait_time);
   }
-  while ($self->do_action_step) {
-    Win32::Sleep($self->wait_intvl);
-  }
-  return 1;
+
+  return $self->SUPER::wait_action();
 }
 
-sub do_state {
+sub reset {
   my $self = shift;
 
-  $self->wait_recognized;
-  $self->wait_action;
+  $self->SUPER::reset;
+
+  delete($self->{rcog_time});
+  delete($self->{rcog_win});
+  delete($self->{end_time});
 }
 
 1;

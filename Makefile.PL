@@ -16,6 +16,7 @@ WriteMakefile(
     'Win32/CtrlGUI/State/dialog.pm' =>       '$(INST_LIBDIR)/CtrlGUI/State/dialog.pm',
     'Win32/CtrlGUI/State/fork.pm' =>         '$(INST_LIBDIR)/CtrlGUI/State/fork.pm',
     'Win32/CtrlGUI/State/loop.pm' =>         '$(INST_LIBDIR)/CtrlGUI/State/loop.pm',
+    'Win32/CtrlGUI/State/multi.pm' =>        '$(INST_LIBDIR)/CtrlGUI/State/multi.pm',
     'Win32/CtrlGUI/State/seq.pm' =>          '$(INST_LIBDIR)/CtrlGUI/State/seq.pm',
     'Win32/CtrlGUI/State/seq_opt.pm' =>      '$(INST_LIBDIR)/CtrlGUI/State/seq_opt.pm',
   },

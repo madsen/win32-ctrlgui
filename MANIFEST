@@ -14,5 +14,6 @@ Win32/CtrlGUI/State/atom.pm
 Win32/CtrlGUI/State/dialog.pm
 Win32/CtrlGUI/State/fork.pm
 Win32/CtrlGUI/State/loop.pm
+Win32/CtrlGUI/State/multi.pm
 Win32/CtrlGUI/State/seq.pm
 Win32/CtrlGUI/State/seq_opt.pm

@@ -10,96 +10,73 @@
 ##########################################################################
 use Win32::CtrlGUI;
 use Win32::CtrlGUI::State;
-use Win32::CtrlGUI::State::seq_opt;
+use Win32::CtrlGUI::State::multi;
 
 use strict;
 
 package Win32::CtrlGUI::State::loop;
 use vars qw($VERSION @ISA);
 
-@ISA = ('Win32::CtrlGUI::State::seq_opt');
+@ISA = ('Win32::CtrlGUI::State::multi');
 
-$VERSION='0.10';
+$VERSION='0.11';
 
 sub _new {
   my $class = shift;
-  my %data = @_;
 
-  my $self = {
-    body_block => undef,
-    body_init => undef,
-    exit_block => undef,
-    timeout => $data{timeout},
-    body_req => $data{body_req},
-    state => 'init',
-    active => undef,
-  };
+  my $self = $class->SUPER::_new(@_);
 
-  bless $self, $class;
-
-  ref $data{body_block} eq 'ARRAY' or die "loop demands an ARRAY ref for the body_block.\n";
-  $self->{body_init} = $data{body_block};
-  $self->_reset_body;
-
-  if (exists $data{exit_block}) {
-    if (ref $data{exit_block} eq 'ARRAY') {
-        $self->{exit_block} = Win32::CtrlGUI::State->new(@{$data{exit_block}});
-    } elsif (UNIVERSAL::isa($data{exit_block}, 'Win32::CtrlGUI::State')) {
-        $self->{exit_block} = $data{exit_block};
-    } else {
-      die "loop demands ARRAY refs or Win32::CtrlGUI::State objects for the exit_block.\n";
-    }
+  if (scalar(@{$self->{states}}) < 1 || scalar(@{$self->{states}}) > 2) {
+    die "$class demands a body state and, optionally, an exit_state.";
   }
 
-  if (!$self->{exit_block} && !$self->{timeout}) {
-    die "loop demands either an exit_block or a timeout.\n";
+  if (scalar(@{$self->{states}}) != 2 && !$self->{timeout}) {
+    die "$class demands either an exit_state or a timeout.\n";
   }
+
+  $self->{body_state} = $self->{states}->[0];
+  scalar(@{$self->{states}}) == 2 and $self->{exit_state} = $self->{states}->[1];
 
   return $self;
 }
 
-sub _reset_body {
-  my $self = shift;
+sub _options {
+  return qw(timeout body_req);
+}
 
-  $self->{body_block} = Win32::CtrlGUI::State->new(@{$self->{body_init}});
-  $self->{active} = undef;
-  $self->{end_time} = 0;
+sub current_state {
+  my $self = shift;
+  return $self->{$self->{active_state}};
 }
 
 sub _is_recognized {
   my $self = shift;
 
-  $self->{active} and return 1;
+  $self->{active_state} and return 1;
 
   if (!$self->{end_time} && $self->{timeout}) {
     $self->{end_time} = Win32::GetTickCount()+$self->{timeout}*1000;
   }
 
-  if ($self->{body_block}->is_recognized) {
+  if ($self->{body_state}->is_recognized) {
     $self->{state} = 'rcog';
-    $self->{active} = 'body_block';
+    $self->{active_state} = 'body_state';
     $self->{body_req} = 0;
     return 1;
   }
 
-  unless ($self->{body_req}) {
-    if ($self->{exit_block}->is_recognized) {
-      $self->{state} = 'rcog';
-      $self->{active} = 'exit_block';
-      return 1;
-    }
+  if (!$self->{body_req} && $self->{exit_state}->is_recognized) {
+    $self->{state} = 'rcog';
+    $self->{active_state} = 'exit_state';
+    return 1;
   }
 
   if ($self->{end_time} && $self->{end_time} < Win32::GetTickCount()) {
     $self->{state} = 'done';
+    $self->debug_print(1, "Loop exiting due to timing out after $self->{timeout} seconds.");
     return 1;
   }
   return 0;
-}
-
-sub current_state {
-  my $self = shift;
-  return $self->{$self->{active}};
 }
 
 sub do_action_step {
@@ -110,24 +87,24 @@ sub do_action_step {
 
   while (1) {
     if ($self->_is_recognized) {
-      $self->{state} eq 'done' and return 0;
-      my $current_state = $self->current_state;
+      $self->{state} eq 'done' and last;
 
-      $current_state->do_action_step;
+      $self->current_state->do_action_step;
 
-      if ($current_state->state =~ /^done|fail$/) {
-        if ($self->{active} eq 'body_block') {
-          $self->_reset_body;
-        } elsif ($self->{active} eq 'exit_block') {
+      if ($self->current_state->state =~ /^done|fail$/) {
+        if ($self->{active_state} eq 'body_state') {
+          $self->{body_state}->reset;
+          $self->{active_state} = undef;
+          $self->{end_time} = 0;
+          next;
+        } elsif ($self->{active_state} eq 'exit_state') {
           $self->{state} = 'done';
-          return 0;
         }
-      } else {
-        return 1;
       }
     }
+
+    last;
   }
-  return 0;
 }
 
 1;

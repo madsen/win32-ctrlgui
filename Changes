@@ -7,3 +7,13 @@ Revision history for Perl extension Win32::CtrlGUI.
         - Added loop support.
         - First public release.
 
+0.11  Wed Jun 13 2001
+        - Added reset support to State hierarchy.
+        - Added more debug_print statements to State hierarchy.
+        - Refactored code in State::seq hierarchy
+        - Refactored lots of code in the State hierarchy to create multi
+          abstract parent class
+        - Discovered overload fallback => 1 !!!!!
+        - Rewrote loop support syntax (important, important)
+        - Added completely new (and, I believe, superior) syntax option for
+          all multi subclasses

@@ -10,16 +10,16 @@
 ##########################################################################
 use Win32::CtrlGUI;
 use Win32::CtrlGUI::State;
-use Win32::CtrlGUI::State::seq_opt;
+use Win32::CtrlGUI::State::multi;
 
 use strict;
 
 package Win32::CtrlGUI::State::fork;
 use vars qw($VERSION @ISA);
 
-@ISA = ('Win32::CtrlGUI::State::seq_opt');
+@ISA = ('Win32::CtrlGUI::State::multi');
 
-$VERSION='0.10';
+$VERSION='0.11';
 
 sub _is_recognized {
   my $self = shift;

@@ -17,7 +17,7 @@ use vars qw($VERSION @ISA);
 
 @ISA = ('Win32::CtrlGUI::State');
 
-$VERSION='0.10';
+$VERSION='0.11';
 
 sub _new {
   my $class = shift;
@@ -25,15 +25,16 @@ sub _new {
 
   $data{criteria}->[0] ne 'neg' or die "Dialogs can't have negative criteria.\n";
 
-  my $pos_atom = Win32::CtrlGUI::State->new('atom',
-      criteria => $data{criteria}, action => $data{action});
+  my(@base_action_keys) = grep(!/^cnfm_/, keys %data);
+  my(@cnfm_action_keys) = grep(/^cnfm_/, keys %data);
+
+  my $pos_atom = Win32::CtrlGUI::State->new('atom', map {$_ => $data{$_}} @base_action_keys);
 
   my $neg_atom = Win32::CtrlGUI::State->new('atom',
       criteria => [neg => sub {$_ == $pos_atom->{rcog_win}}], action_delay => 0);
 
-  if ($data{cnfm_criteria}) {
-    my $cnfm_atom = Win32::CtrlGUI::State->new('atom',
-        criteria => $data{cnfm_criteria}, action => $data{cnfm_action});
+  if (scalar(@cnfm_action_keys)) {
+    my $cnfm_atom = Win32::CtrlGUI::State->new('atom', map {substr($_, 5) => $data{$_}} @cnfm_action_keys);
     return Win32::CtrlGUI::State->new('seq', $pos_atom, ['seq_opt', $cnfm_atom, $neg_atom]);
   } else {
     return Win32::CtrlGUI::State->new('seq', $pos_atom, $neg_atom);

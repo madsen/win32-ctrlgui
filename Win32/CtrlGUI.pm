@@ -3,8 +3,8 @@
 # Win32::CtrlGUI - a Module for controlling Win32 GUIs based on Win32::Setupsup
 #
 # Author: Toby Everett
-# Revision: 0.10
-# Last Change: Developed
+# Revision: 0.11
+# Last Change:
 ###########################################################################
 # Copyright 2000, 2001 Toby Everett.  All rights reserved.
 #
@@ -26,7 +26,7 @@ use strict;
 package Win32::CtrlGUI;
 use vars qw($VERSION $wait_intvl);
 
-$VERSION='0.10';
+$VERSION='0.11';
 
 &init;
 
