@@ -17,7 +17,7 @@ use strict;
 package Win32::CtrlGUI::State::bookkeeper;
 use vars qw($VERSION $AUTOLOAD);
 
-$VERSION='0.22';
+$VERSION='0.30';
 
 
 sub new {

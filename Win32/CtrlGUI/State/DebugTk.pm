@@ -22,7 +22,7 @@ use strict;
 package Win32::CtrlGUI::State::DebugTk;
 use vars qw($VERSION $mw $root_bookkeeper $hlist $hlist_stuff $font $statusarea $paused $pausebutton $resumebutton $debugmode);
 
-$VERSION='0.22';
+$VERSION='0.30';
 
 
 &init;

@@ -19,7 +19,7 @@ use vars qw($VERSION @ISA);
 
 @ISA = ('Win32::CtrlGUI::State::multi');
 
-$VERSION='0.22';
+$VERSION='0.30';
 
 sub init {
   my $self = shift;

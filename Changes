@@ -1,5 +1,15 @@
 Revision history for Perl extension Win32::CtrlGUI.
 
+0.30 Fri May 24 2002
+	- Added get_property method to Win32::CtrlGUI::Window
+	- Added send_message and post_message methods to
+	  Win32::CtrlGUI::Window
+	- Added get_text method to Win32::CtrlGUI::Window
+	- Added lb_get_items, lb_get_selindexes, and lb_set_selindexes methods
+	  to Win32::CtrlGUI::Window
+	- Added cb_get_items, cb_get_selindex, and cb_set_selindex methods
+	  to Win32::CtrlGUI::Window
+
 0.22 Tue Oct 30 2001
 	- Bugfix in Win32::CtrlGUI::Criteria::multi to deal with criteria that return booleans
 	- Added a NAME section to the POD in Win32::CtrlGUI::State::DebugTk.pm
