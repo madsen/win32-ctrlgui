@@ -18,7 +18,7 @@ use vars qw($VERSION @ISA $action_error_handler);
 
 @ISA = ('Win32::CtrlGUI::State');
 
-$VERSION='0.20';
+$VERSION='0.21';
 
 sub _new {
   my $class = shift;
@@ -42,7 +42,11 @@ sub is_recognized {
     }
     my $rcog = $self->{criteria}->is_recognized;
     if ($rcog) {
-      ref $rcog and $self->{rcog_win} = $rcog;
+      if (ref $rcog) {
+        $self->{rcog_win} = $rcog;
+        $self->{name} and $Win32::CtrlGUI::Window::named_windows{$self->{name}} = $rcog;
+      }
+
       $self->{state} = 'rcog';
       $self->{rcog_time} = Win32::GetTickCount();
       $self->debug_print(1, "Criteria $self->{criteria} met.");
@@ -65,7 +69,7 @@ sub do_action_step {
   if ($self->state eq 'rcog') {
     $self->{state} = 'actn';
     my $wait_time = $self->{rcog_time}/1000 + $self->action_delay - Win32::GetTickCount()/1000;
-    $wait_time > 0 and $self->debug_print(1, "Looping for $wait_time seconds before executing action.");
+    $wait_time > 0 and $self->debug_print(1, sprintf("Looping for %0.3f seconds before executing action.", $wait_time));
   }
   $self->state eq 'actn' or return;
 
@@ -114,6 +118,7 @@ sub reset {
   delete($self->{rcog_time});
   delete($self->{rcog_win});
   delete($self->{end_time});
+  UNIVERSAL::isa($self->{criteria}, 'Win32::CtrlGUI::Criteria') and $self->{criteria}->reset;
 }
 
 sub action_error_handler {
@@ -122,6 +127,43 @@ sub action_error_handler {
   ref($self->{action_error_handler}) eq 'CODE' and return $self->{action_error_handler};
   ref($action_error_handler) eq 'CODE' and return $action_error_handler;
   return sub { die $_[0]; };
+}
+
+sub stringify {
+  my $self = shift;
+
+  return join("\n", map {"$_ =>$self->{$_}"} grep {exists $self->{$_}} qw(criteria action name timeout));
+}
+
+sub tagged_stringify {
+  my $self = shift;
+
+  my @retval;
+
+  push(@retval, ["criteria:\t", 'default']);
+  push(@retval, $self->{criteria}->tagged_stringify);
+  push(@retval, ["\n", 'default']);
+
+  foreach my $i (qw(action name)) {
+    exists $self->{$i} or next;
+    push(@retval, ["$i:\t$self->{$i}\n", 'default']);
+  }
+
+  if ($self->{timeout}) {
+    my $timeout;
+    if ($self->{end_time}) {
+      $timeout = ($self->{end_time}-Win32::GetTickCount())/1000;
+      $timeout < 0 and $timeout = 0;
+      $timeout = sprintf("%0.3f", $timeout);
+    } else {
+      $timeout = 'wait';
+    }
+    push(@retval, ["timeout => $timeout\n", 'default']);
+  }
+
+  chomp($retval[$#retval]->[0]);
+
+  return @retval;
 }
 
 1;

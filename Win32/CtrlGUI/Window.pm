@@ -3,8 +3,8 @@
 # Win32::CtrlGUI::Window - an OO interface for controlling Win32 GUI windows
 #
 # Author: Toby Everett
-# Revision: 0.20
-# Last Change: Added existence checking code throughout
+# Revision: 0.21
+# Last Change:
 ###########################################################################
 # Copyright 2000, 2001 Toby Everett.  All rights reserved.
 #
@@ -22,7 +22,7 @@ use strict;
 package Win32::CtrlGUI::Window;
 use vars qw($VERSION %atom_map $sendkey_activate $sendkey_intvl);
 
-$VERSION='0.20';
+$VERSION='0.21';
 
 use overload
   '""'  => \&text,

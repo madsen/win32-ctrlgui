@@ -18,7 +18,7 @@ use vars qw($VERSION);
 use overload
   '""'  => sub {$_[0]->stringify};
 
-$VERSION='0.20';
+$VERSION='0.21';
 
 =head1 NAME
 
@@ -37,34 +37,38 @@ Win32::CtrlGUI::Criteria - an OO interface for expressing state criteria
 
 =head1 DESCRIPTION
 
-C<Win32::CtrlGUI::Criteria> objects represent state criteria, and are used by the
-C<Win32::CtrlGUI::State> system to determine when a state has been entered.  There are three main
-subclasses - C<Win32::CtrlGUI::Criteria::pos>, C<Win32::CtrlGUI::Criteria::neg>, and
-C<Win32::CtrlGUI::Criteria::arbitrary>.  These will be discussed in the documentation for
-C<Win32::CtrlGUI::Criteria>, rather than in the implementation classes.
+C<Win32::CtrlGUI::Criteria> objects represent state criteria, and are used by
+the C<Win32::CtrlGUI::State> system to determine when a state has been entered.
+There are three main subclasses - C<Win32::CtrlGUI::Criteria::pos>,
+C<Win32::CtrlGUI::Criteria::neg>, and C<Win32::CtrlGUI::Criteria::arbitrary>.
+These will be discussed in the documentation for C<Win32::CtrlGUI::Criteria>,
+rather than in the implementation classes.
 
 =head1 METHODS
 
 =head2 new
 
-The first parameter to the C<new> method is the subclass to create - C<pos>, C<neg>, or
-C<arbitrary>. The remaining parameters are passed to the C<new> method for that class.  Thus,
-C<Win32::CtrlGUI::Criteria-E<gt>new(pos => qr/Notepad/)> is the same as
+The first parameter to the C<new> method is the subclass to create - C<pos>,
+C<neg>, or C<arbitrary>. The remaining parameters are passed to the C<new>
+method for that class.  Thus, C<Win32::CtrlGUI::Criteria-E<gt>new(pos =>
+qr/Notepad/)> is the same as
 C<Win32::CtrlGUI::Criteria::pos-E<gt>new(qr/Notepad/)>.
 
-The passed parameters for the C<pos> and C<neg> subclasses are the window criteria and
-childcriteria, with the same options available as for C<Win32::CtrlGUI::wait_for_window>.  The
-C<pos> subclass will return true (i.e. the criteria are met) when a window matching those criteria
-exists.  The C<neg> subclass will return true when no windows matching the passed criteria exist.
-The C<pos> subclass will return a C<Win32::CtrlGUI::Window> object for the matching window when it
-returns true.
+The passed parameters for the C<pos> and C<neg> subclasses are the window
+criteria and childcriteria, with the same options available as for
+C<Win32::CtrlGUI::wait_for_window>.  The C<pos> subclass will return true (i.e.
+the criteria are met) when a window matching those criteria exists.  The C<neg>
+subclass will return true when no windows matching the passed criteria exist.
+The C<pos> subclass will return a C<Win32::CtrlGUI::Window> object for the
+matching window when it returns true.
 
-The C<arbitrary> subclass takes a code reference and a list of hash parameters.  The hash
-parameters will be added to the C<Win32::CtrlGUI::Criteria::arbitrary> object, and the code
-reference will be passed a reference to the C<Win32::CtrlGUI::Criteria::arbitrary> object at
-run-time.  This enables the code reference to use the C<Win32::CtrlGUI::Criteria::arbitrary> to
-store state.  The code reference should return true when evaluated if the state criteria have been
-met.
+The C<arbitrary> subclass takes a code reference and a list of hash parameters.
+The hash parameters will be added to the C<Win32::CtrlGUI::Criteria::arbitrary>
+object, and the code reference will be passed a reference to the
+C<Win32::CtrlGUI::Criteria::arbitrary> object at run-time.  This enables the
+code reference to use the C<Win32::CtrlGUI::Criteria::arbitrary> to store
+state.  The code reference should return true when evaluated if the state
+criteria have been met.
 
 =cut
 
@@ -80,8 +84,8 @@ sub new {
 
 =head stringify
 
-The C<stringify> method is called by the overloaded stringification operator and should return a
-printable string suitable for debug work.
+The C<stringify> method is called by the overloaded stringification operator
+and should return a printable string suitable for debug work.
 
 =cut
 
@@ -90,12 +94,14 @@ sub stringify {
 
   my $subclass = ref $self;
   $subclass =~ s/^.*:://;
-  my $retval = "$subclass: ";
+  my $retval = "$subclass:[";
 
   if (ref $self->{criteria} eq 'Regexp') {
     $retval .= "/".$self->{criteria}."/";
   } elsif (ref $self->{criteria} eq 'CODE') {
     $retval .= 'CODE';
+  } elsif (ref $self->{criteria} eq 'SCALAR') {
+    $retval .= "\\'".${$self->{criteria}}."'";
   } else {
     $retval .= "'$self->{criteria}'";
   }
@@ -110,13 +116,32 @@ sub stringify {
     }
   }
 
+  $retval .= "]";
   return $retval;
+}
+
+sub tagged_stringify {
+  my $self = shift;
+
+  return [$self->stringify, 'default'];
 }
 
 =head is_recognized
 
-The C<is_recognized> method is called to determine if the criteria are currently being met.
+The C<is_recognized> method is called to determine if the criteria are
+currently being met.
 
 =cut
+
+sub is_recognized {
+  my $self = shift;
+
+  die "Win32::CtrlGUI::Criteria::is_recognized is an abstract method and needs to be overriden.\n";
+}
+
+sub reset {
+  my $self = shift;
+
+}
 
 1;

@@ -3,7 +3,7 @@
 # Win32::CtrlGUI - a Module for controlling Win32 GUIs based on Win32::Setupsup
 #
 # Author: Toby Everett
-# Revision: 0.20
+# Revision: 0.21
 # Last Change:
 ###########################################################################
 # Copyright 2000, 2001 Toby Everett.  All rights reserved.
@@ -26,7 +26,7 @@ use strict;
 package Win32::CtrlGUI;
 use vars qw($VERSION $wait_intvl);
 
-$VERSION='0.20';
+$VERSION='0.21';
 
 &init;
 
@@ -43,12 +43,13 @@ Win32::CtrlGUI - a Module for controlling Win32 GUIs based on Win32::Setupsup
 
 =head1 DESCRIPTION
 
-C<Win32::CtrlGUI> makes it much easier to use C<Win32::Setupsup> to control Win32 GUIs.  It relies
-completely on C<Win32::Setupsup> for its underlying interaction with the GUI, but it provides a
-very powerful and somewhat user-friendly OO interface to make things easier.
+C<Win32::CtrlGUI> makes it much easier to use C<Win32::Setupsup> to control
+Win32 GUIs.  It relies completely on C<Win32::Setupsup> for its underlying
+interaction with the GUI, but it provides a very powerful and somewhat
+user-friendly OO interface to make things easier.
 
-There are a number of modules in the system, so a brief overview will be provided to make it easier
-to understand.
+There are a number of modules in the system, so a brief overview will be
+provided to make it easier to understand.
 
 =over 4
 
@@ -58,49 +59,57 @@ This module provides a set of methods for identifying and enumerating windows.
 
 =item C<Win32::CtrlGUI::Window>
 
-C<Win32::CtrlGUI::Window> objects represent GUI windows.  Internally, they simply store the window
-handle.  Stringification is overloaded to return the window text, whereas numification and numeric
-comparison are overloaded to operate on the handle.  Friendlier versions of the methods applicable
-to windows are provided.  Finally, a C<send_keys> method is provided that uses a (IMHO) friendlier
-syntax (it's based on that used by WinBatch).  Instead of sending the string
-C<\\ALT+\\f\\ALT-\\x>, one sends C<!fx>.  Instead of sending C<\\RET\\>, one sends C<{ENTER}> or
-C<{RET}>.  Instead of sending C<\\DOWN\\\\DOWN\\\\DOWN\\>, one can send C<{DOWN 3}>.
+C<Win32::CtrlGUI::Window> objects represent GUI windows.  Internally, they
+simply store the window handle.  Stringification is overloaded to return the
+window text, whereas numification and numeric comparison are overloaded to
+operate on the handle.  Friendlier versions of the methods applicable to
+windows are provided.  Finally, a C<send_keys> method is provided that uses a
+(IMHO) friendlier syntax (it's based on that used by WinBatch).  Instead of
+sending the string C<\\ALT+\\f\\ALT-\\x>, one sends C<!fx>.  Instead of sending
+C<\\RET\\>, one sends C<{ENTER}> or C<{RET}>.  Instead of sending
+C<\\DOWN\\\\DOWN\\\\DOWN\\>, one can send C<{DOWN 3}>.
 
 =item C<Win32::CtrlGUI::State>
 
-The C<Win32::CtrlGUI::State> hierarchy of modules provides for a very powerful state machine
-system for responding to windows and executing actions as a result.  If you're using
-C<Win32::CtrlGUI> to script any sort of process, I strongly encourage you to look at the
-documentation in C<Win32::CtrlGUI::State>.  Yes, it's complicated.  But so is writing your own
-code to deal with optional windows, sequence forking, and so forth.  For now, there isn't much
-documentation.  See the demo.pl script for some ideas, and beyond that, feel free to contact me
-if you have questions.
+The C<Win32::CtrlGUI::State> hierarchy of modules provides for a very powerful
+state machine system for responding to windows and executing actions as a
+result.  If you're using C<Win32::CtrlGUI> to script any sort of process, I
+strongly encourage you to look at the documentation in
+C<Win32::CtrlGUI::State>.  Yes, it's complicated.  But so is writing your own
+code to deal with optional windows, sequence forking, and so forth.  For now,
+there isn't much documentation.  See the demo.pl script for some ideas, and
+beyond that, feel free to contact me if you have questions.
 
-Also, there is a Tk debugger now.  It requires, of course, that Tk be installed.  I haven't done
-much testing to see how it behaves on anything other than Perl 5.6.0 with Tk 800.022.  Take a look
-at demotk.pl for an example.
+Also, there is a Tk debugger now.  It requires, of course, that Tk be
+installed.  I haven't done much testing to see how it behaves on anything other
+than Perl 5.6.0 with Tk 800.022.  Take a look at demotk.pl for an example.
 
 =item C<Win32::CtrlGUI::Criteria>
 
-The C<Win32::CtrlGUI::Criteria> hierarchy supports the C<Win32::CtrlGUI::State> hierarchy by
-providing an OO interface to state criteria.
+The C<Win32::CtrlGUI::Criteria> hierarchy supports the C<Win32::CtrlGUI::State>
+hierarchy by providing an OO interface to state criteria.
 
 =back
 
 =head2 Installation instructions
 
 C<Win32::CtrlGUI> depends on C<Win32::Setupsup>, available from
-http://www.cpan.org/modules/by-module/Win32/setupsup.1.0.1.0.zip, although you might want to check
-that folder to see if there is a more recent version.
+http://www.cpan.org/modules/by-module/Win32/setupsup.1.0.1.0.zip, although you
+might want to check that folder to see if there is a more recent version.
 
-Standard C<Make::Maker> approach or just move everything in C<Win32> into C<site/lib/Win32>.
+If you want to use the Tk debugger/observer, you will need C<Tk> and
+C<Win32::API>.  Both are available from CPAN and via PPM.
+
+Standard C<Make::Maker> approach or just move everything in C<Win32> into
+C<site/lib/Win32>.
 
 =head1 METHODS
 
 =head2 enum_windows
 
-This method returns a list of C<Win32::CtrlGUI::Window> objects representing the windows currently
-open.  It uses C<Win32::Setupsup::EnumWindows> for the underlying call.
+This method returns a list of C<Win32::CtrlGUI::Window> objects representing
+the windows currently open.  It uses C<Win32::Setupsup::EnumWindows> for the
+underlying call.
 
 =cut
 
@@ -111,10 +120,11 @@ sub enum_windows {
 
 =head2 wait_for_window
 
-This method waits a for a window matching the passed criteria.  It accepts three parameters -
-criteria for the window, criteria for the child window, and a timeout.  The last two parameters
-are optional.  If you need to specify a timeout, but don't want to specify criteria for the child
-window, pass C<undef> as the child window criteria.
+This method waits a for a window matching the passed criteria.  It accepts
+three parameters - criteria for the window, criteria for the child window, and
+a timeout.  The last two parameters are optional.  If you need to specify a
+timeout, but don't want to specify criteria for the child window, pass C<undef>
+as the child window criteria.
 
 Criteria can be one of three things:
 
@@ -122,7 +132,8 @@ Criteria can be one of three things:
 
 =item *
 
-A string.  In this case, the string will be matched case insensitively against the window title.
+A string.  In this case, the string will be matched case insensitively against
+the window title.
 
 =item *
 
@@ -130,19 +141,21 @@ A regular expression.  These should be passed using the C<qr/ . . . /> syntax.
 
 =item *
 
-A code reference (i.e. C<sub { . . . }>).  Code references will have access to a
-C<Win32::CtrlGUI::Window> object in C<$_> and should return true or false.
+A code reference (i.e. C<sub { . . . }>).  Code references will have access to
+a C<Win32::CtrlGUI::Window> object in C<$_> and should return true or false.
 
 =back
 
-These three formats can be used both for the window and the child window criteria.  In the special
-case of a string match on the window and no child window criteria,
-C<Win32::Setupsup::WaitForWindow> will be used.  In all other cases, a busy loop is executed using
-the default wait interval in C<$Win32::CtrlGUI::wait_intvl> (specified in milliseconds).
+These three formats can be used both for the window and the child window
+criteria.  In the special case of a string match on the window and no child
+window criteria, C<Win32::Setupsup::WaitForWindow> will be used.  In all other
+cases, a busy loop is executed using the default wait interval in
+C<$Win32::CtrlGUI::wait_intvl> (specified in milliseconds).
 
-The call will return a C<Win32::CtrlGUI::Window> object if successful or C<undef> if it timesout.
-If the timeout value is unspecified or negative, it waits indefinitely.  Timeout values are
-specified in seconds (fractional seconds are allowed).
+The call will return a C<Win32::CtrlGUI::Window> object if successful or
+C<undef> if it timesout. If the timeout value is unspecified or negative, it
+waits indefinitely.  Timeout values are specified in seconds (fractional
+seconds are allowed).
 
 =cut
 
@@ -174,10 +187,11 @@ sub wait_for_window {
 
 =head2 get_windows
 
-This method returns a list of all windows matching the passed criteria.  Same criteria format as
-for C<wait_for_window>.  Instead of a timeout, the third parameter is the optional justone
-parameter. If it is true, C<get_windows> returns only the first window to match the criteria.  The
-returned windows are, of course, C<Win32::CtrlGUI::Window> objects.
+This method returns a list of all windows matching the passed criteria.  Same
+criteria format as for C<wait_for_window>.  Instead of a timeout, the third
+parameter is the optional justone parameter. If it is true, C<get_windows>
+returns only the first window to match the criteria.  The returned windows are,
+of course, C<Win32::CtrlGUI::Window> objects.
 
 =cut
 
@@ -196,6 +210,8 @@ sub get_windows {
       &$criteria and $test = 1;
     } elsif (ref $criteria eq 'Regexp') {
       $temp =~ /$criteria/ and $test = 1;
+    } elsif (ref $criteria eq 'SCALAR') {
+      $i == $Win32::CtrlGUI::Window::named_windows{${$criteria}} and $test = 1;
     } else {
       lc($temp) eq lc($criteria) and $test = 1;
     }

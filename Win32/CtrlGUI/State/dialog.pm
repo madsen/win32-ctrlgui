@@ -17,7 +17,9 @@ use vars qw($VERSION @ISA);
 
 @ISA = ('Win32::CtrlGUI::State');
 
-$VERSION='0.20';
+$VERSION='0.21';
+
+my $dialog_name = 'dialog001';
 
 sub _new {
   my $class = shift;
@@ -25,13 +27,15 @@ sub _new {
 
   $data{criteria}->[0] ne 'neg' or die "Dialogs can't have negative criteria.\n";
 
+  $data{name} ||= $dialog_name++;
+
   my(@base_action_keys) = grep(!/^cnfm_/, keys %data);
   my(@cnfm_action_keys) = grep(/^cnfm_/, keys %data);
 
   my $pos_atom = Win32::CtrlGUI::State->new('atom', map {$_ => $data{$_}} @base_action_keys);
 
   my $neg_atom = Win32::CtrlGUI::State->new('atom',
-      criteria => [neg => sub {$_ == $pos_atom->{rcog_win}}], action_delay => 0);
+      criteria => [neg => \$data{name}], action_delay => 0);
 
   if (scalar(@cnfm_action_keys)) {
     my $cnfm_atom = Win32::CtrlGUI::State->new('atom', map {substr($_, 5) => $data{$_}} @cnfm_action_keys);

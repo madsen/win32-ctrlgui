@@ -19,7 +19,7 @@ use vars qw($VERSION @ISA);
 
 @ISA = ('Win32::CtrlGUI::State::multi');
 
-$VERSION='0.20';
+$VERSION='0.21';
 
 sub _options {
   return qw(timeout body_req);

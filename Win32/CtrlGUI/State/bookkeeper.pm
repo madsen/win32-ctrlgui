@@ -17,7 +17,7 @@ use strict;
 package Win32::CtrlGUI::State::bookkeeper;
 use vars qw($VERSION $AUTOLOAD);
 
-$VERSION='0.20';
+$VERSION='0.21';
 
 
 sub new {
@@ -100,7 +100,6 @@ sub do_state {
 sub reset {
   my $self = shift;
 
-  $self->{executed} = 0;
   return $self->{state}->reset;
 }
 

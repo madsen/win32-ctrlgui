@@ -1,3 +1,13 @@
+###########################################################################
+# Copyright 2000, 2001 Toby Everett.  All rights reserved.
+#
+# This file is distributed under the Artistic License. See
+# http://www.ActiveState.com/corporate/artistic_license.htm or
+# the license that comes with your perl distribution.
+#
+# For comments, questions, bugs or general interest, feel free to
+# contact Toby Everett at teverett@alascom.att.com
+##########################################################################
 use Win32::CtrlGUI;
 use Win32::CtrlGUI::State;
 
@@ -12,16 +22,20 @@ use strict;
 package Win32::CtrlGUI::State::DebugTk;
 use vars qw($VERSION $mw $root_bookkeeper $hlist $hlist_stuff $font $statusarea $paused $pausebutton $resumebutton $debugmode);
 
+$VERSION='0.21';
+
+
 &init;
 
 =head1 Rudimentary Instructions
 
-If you want to try a cool demo, simply close all open Notepad windows and then open a single,
-empty Notepad window.  Then run demotk.pl.  Resize the Tk window that pops up so you can see
-stuff.  Then do the same thing, but first open demotk.pl in Notepad and add a single carriage
-return to the end of the file.  Then play with fresh Notepad windows that have random text in them
-(the contents will get save to C:\Temp\saved.txt, so if you have a file by that name in existence,
-be careful:).
+If you want to try a cool demo, simply close all open Notepad windows and then
+open a single, empty Notepad window.  Then run demotk.pl.  Resize the Tk window
+that pops up so you can see stuff.  Then do the same thing, but first open
+demotk.pl in Notepad and add a single carriage return to the end of the file.
+Then play with fresh Notepad windows that have random text in them (the
+contents will get save to C:\Temp\saved.txt, so if you have a file by that name
+in existence, be careful:).
 
 The color scheme is:
   Red and bold: active state
@@ -30,12 +44,15 @@ The color scheme is:
   Black and crossed out: state will never be reached
   Dark red: state has been executed
 
-Also notice that you can pause and resume scripts.  You have to hit exit to terminate the script,
-but if you don't set C<$Win32::CtrlGUI::State::DebugTk::debugmode> to 1, it will terminate as soon
-as the Win32::CtrlGUI::State stuff is finished, making it ideal for using with production scripts.
+Also notice that you can pause and resume scripts.  You have to hit exit to
+terminate the script, but if you don't set
+C<$Win32::CtrlGUI::State::DebugTk::debugmode> to 1, it will terminate as soon
+as the Win32::CtrlGUI::State stuff is finished, making it ideal for using with
+production scripts.
 
-Also, try opening the Notepad window, waiting for the script to recognize it (state goes red), but
-then close it before it sends the text.  Notice that it halts the script and alerts you.
+Also, try opening the Notepad window, waiting for the script to recognize it
+(state goes red), but then close it before it sends the text.  Notice that it
+halts the script and alerts you.
 
 =cut
 
@@ -47,7 +64,7 @@ sub newdo {
 
   $Win32::CtrlGUI::State::atom::action_error_handler = sub {
     my($errormsg) = @_;
-    &update_status(1);
+    &update_status('paused');
     $mw->deiconify;
     $mw->update;
     my $dialog = $mw->Dialog(-text => "The following exception was thrown:\n$errormsg",
@@ -70,12 +87,14 @@ sub newdo {
   }
 
   $hlist = $mw->Scrolled('HList', -scrollbars => 'se', -drawbranch => 1, -separator => '/',
-             -indent => 15)->pack(-side => 'top', -expand => 1, -fill => 'both');
+             -indent => 15, -background => 'grey')->pack(-side => 'top', -expand => 1, -fill => 'both');
+  $hlist->Subwidget('scrolled')->configure(-padx => 2, -pady => 2);
+
 
   my $exit_trigger = 0;
   $mw->protocol(WM_DELETE_WINDOW => sub {$exit_trigger = 1});
 
-  $statusarea = $mw->Scrolled('ROText', -scrollbars => 'se', -width => 140, -height => 9)->pack(-side => 'top', -fill => 'both');
+  $statusarea = $mw->Scrolled('ROText', -scrollbars => 'se', -width => 140, -height => 9, -wrap => 'none')->pack(-side => 'top', -fill => 'both');
   $mw->Button(-text => 'Exit', -command => sub {$exit_trigger = 1})->pack(-side => 'right', -padx => 5, -pady => 5);
   $resumebutton = $mw->Button(-text => 'Resume', -command => sub {&update_status('running')})->pack(-side => 'right', -padx => 5, -pady => 5);
   $pausebutton = $mw->Button(-text => 'Pause', -command => sub {&update_status('paused')})->pack(-side => 'right', -padx => 5, -pady => 5);
@@ -137,7 +156,7 @@ sub update_status {
 sub append_to_status_area {
   my($text) = @_;
 
-  $statusarea->insert('end', $text ? (split(/\s+/,localtime(time)))[3]." $text\n" : "\n");
+  $statusarea->insert('end', $text ? map {(split(/\s+/,localtime($_->[0])))[3].sprintf(".%03d", $_->[1])." $text\n"} [&finetime] : "\n");
   $statusarea->see('end');
 }
 
@@ -148,9 +167,21 @@ sub add_state {
   if (UNIVERSAL::isa($bookkeeper->{state}, 'Win32::CtrlGUI::State::multi')) {
     ($text = ref($bookkeeper->{state})) =~ s/^Win32::CtrlGUI::State:://;
   } else {
-    $text = "criteria => $bookkeeper->{state}->{criteria}\naction => $bookkeeper->{state}->{action}";
+    $text = $bookkeeper->{state}->stringify;
+    $text =~ s/^([^=]+) =>/$1:\t/gm;
   }
-  my $widget = $hlist->Label(-text => $text, -anchor => 'w', -font => $font, -justify => 'left');
+
+  my $widget = $hlist->ROText(-wrap => 'none', -borderwidth => 0, -background => 'grey', -height => 1, -width => 200, -tabs => ['35p']);
+  $widget->tagConfigure('active', -foreground => 'red', -font => [@{$font}, 'bold']);
+  $widget->tagConfigure('pcs', -foreground => 'black', -font => [@{$font}, 'bold']);
+  $widget->tagConfigure('pfs', -foreground => 'black', -font => [@{$font}]);
+  $widget->tagConfigure('executed', -foreground => 'dark red', -font => [@{$font}]);
+  $widget->tagConfigure('skipped', -foreground => 'black', -font => [@{$font}, 'overstrike']);
+  $widget->tagConfigure('default', map {@{$_}[0,4]} $widget->tagConfigure('pfs'));
+
+  $widget->insert('end', $text, 'default');
+  $widget->configure(-height => ($text =~ tr/\n//)+1);
+
   $hlist->add($path, -itemtype => 'window', -widget => $widget);
   $hlist_stuff->{$path} = {widget => $widget, bookkeeper => $bookkeeper};
   if (UNIVERSAL::isa($bookkeeper->{state}, 'Win32::CtrlGUI::State::multi')) {
@@ -168,24 +199,41 @@ sub refresh_states {
   my $status = $stuff->{bookkeeper}->bk_status_given($pstatus);
   if ($status ne $stuff->{old_status}) {
     if ($status eq 'active') {
-      $stuff->{widget}->configure(-foreground => 'red', -font => [@{$font}, 'bold']);
+      $stuff->{widget}->tagConfigure('default', map {@{$_}[0,4]} $stuff->{widget}->tagConfigure($status));
       $hlist->yview($path);
-    } elsif ($status eq 'pcs') {
-      $stuff->{widget}->configure(-foreground => 'black', -font => [@{$font}, 'bold']);
-    } elsif ($status eq 'pfs') {
-      $stuff->{widget}->configure(-foreground => 'black', -font => [@{$font}]);
+    } elsif ($status eq 'pcs' or $status eq 'pfs') {
+      $stuff->{widget}->tagConfigure('default', map {@{$_}[0,4]} $stuff->{widget}->tagConfigure($status));
     } elsif ($status eq 'never') {
       if ($stuff->{bookkeeper}->{executed}) {
-        $stuff->{widget}->configure(-foreground => 'dark red', -font => [@{$font}]);
+        $stuff->{widget}->tagConfigure('default', map {@{$_}[0,4]} $stuff->{widget}->tagConfigure('executed'));
       } else {
-        $stuff->{widget}->configure(-foreground => 'black', -font => [@{$font}, 'overstrike']);
+        $stuff->{widget}->tagConfigure('default', map {@{$_}[0,4]} $stuff->{widget}->tagConfigure('skipped'));
       }
     } else {
       die "ARGH!";
     }
+
+    if ($stuff->{old_status} eq 'pcs' && !UNIVERSAL::isa($stuff->{bookkeeper}->{state}, 'Win32::CtrlGUI::State::multi')) {
+      my $text = $stuff->{bookkeeper}->{state}->stringify;
+      $text =~ s/^([^=]+) =>/$1:\t/gm;
+      $stuff->{widget}->delete('1.0', 'end');
+      $stuff->{widget}->insert('end', $text, 'default');
+      $stuff->{widget}->configure(-height => ($text =~ tr/\n//)+1);
+    }
+
     $stuff->{old_status} = $status;
   }
 
+  if ($status eq 'pcs' && !UNIVERSAL::isa($stuff->{bookkeeper}->{state}, 'Win32::CtrlGUI::State::multi')) {
+    my(@text) = $stuff->{bookkeeper}->{state}->tagged_stringify;
+    $stuff->{widget}->delete('1.0', 'end');
+    my $lines = 1;
+    foreach my $i (@text) {
+      $stuff->{widget}->insert('end', $i->[0], $i->[1]);
+      $lines += ($i->[0] =~ tr/\n//);
+    }
+    $stuff->{widget}->configure(-height => $lines);
+  }
 
   my(@children) = $hlist->info('children', $path);
 
@@ -202,8 +250,33 @@ sub init {
   $mw = MainWindow->new;
   $mw->withdraw();
   $font = [qw(Arial 8)];
-  $mw->geometry("700x500");
+
+  my $width = $mw->screenwidth();
+  my $height = $mw->screenheight();
+  $mw->geometry(sprintf("%dx%d+%d+%d", $width*.4, $height-100, $width*.6-32, 0));
+
   $debugmode = 0;
+}
+
+{
+  my $finetime_tick;
+  my $finetime_time;
+
+  sub finetime {
+    unless ($finetime_tick) {
+      $finetime_time = time+1;
+      until ($finetime_time <= time) {
+        $finetime_tick = Win32::GetTickCount();
+      }
+    }
+
+    my $tick = Win32::GetTickCount();
+    my($finetime, $finetick) = ($finetime_time + int(($tick-$finetime_tick)/1000), ($tick-$finetime_tick)%1000);
+
+    $finetime = $finetime + int(($finetime-time+2_147_483_648)/4_294_967_296);
+
+    return wantarray ? ($finetime, $finetick) : $finetime + $finetick/1000;
+  }
 }
 
 1;

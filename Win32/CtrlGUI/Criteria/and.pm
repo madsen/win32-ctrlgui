@@ -9,41 +9,23 @@
 # contact Toby Everett at teverett@alascom.att.com
 ##########################################################################
 use Win32::CtrlGUI;
-use Win32::CtrlGUI::State;
-use Win32::CtrlGUI::State::multi;
+use Win32::CtrlGUI::Criteria;
+use Win32::CtrlGUI::Criteria::multi;
 
 use strict;
 
-package Win32::CtrlGUI::State::fork;
+package Win32::CtrlGUI::Criteria::and;
 use vars qw($VERSION @ISA);
 
-@ISA = ('Win32::CtrlGUI::State::multi');
+@ISA = ('Win32::CtrlGUI::Criteria::multi');
 
 $VERSION='0.21';
 
-sub init {
+sub _is_recognized {
   my $self = shift;
 
-  foreach my $i ($self->get_states) {
-    $i->bk_set_status('pcs');
-  }
-}
-
-sub state_recognized {
-  my $self = shift;
-
-  foreach my $i ($self->get_states) {
-    $i->bk_status eq 'active' and next;
-    $i->bk_set_status('never');
-  }
-}
-
-sub state_completed {
-  my $self = shift;
-
-  foreach my $i ($self->get_states) {
-    $i->bk_set_status('never');
-  }
+  scalar( grep {!$_} @{$self->{criteria_status}} ) and return 0;
+  return $self->{criteria_status}->[0];
 }
 
 1;

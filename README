@@ -61,6 +61,9 @@ DESCRIPTION
     although you might want to check that folder to see if there is a more
     recent version.
 
+    If you want to use the Tk debugger/observer, you will need `Tk' and
+    `Win32::API'. Both are available from CPAN and via PPM.
+
     Standard `Make::Maker' approach or just move everything in `Win32' into
     `site/lib/Win32'.
 

@@ -19,7 +19,7 @@ use vars qw($VERSION @ISA);
 
 @ISA = ('Win32::CtrlGUI::State');
 
-$VERSION='0.20';
+$VERSION='0.21';
 
 sub _new {
   my $class = shift;
@@ -57,15 +57,15 @@ sub _new {
   return $self;
 }
 
-#### _options is a class method that returns a list of known "options" that the class accepts -
-#### options are considered to be paired with their value.
+#### _options is a class method that returns a list of known "options" that the
+#### class accepts - options are considered to be paired with their value.
 
 sub _options {
   return qw();
 }
 
-#### init gets called when a multi is initialized (i.e. by new) and when it is reset.  It should
-#### set the subclass statuses appropriately.
+#### init gets called when a multi is initialized (i.e. by new) and when it is
+#### reset.  It should set the subclass statuses appropriately.
 
 sub init {
   my $self = shift;
@@ -73,8 +73,9 @@ sub init {
   die "Win32::CtrlGUI::State::multi::init is an abstract method.";
 }
 
-#### state_recognized gets called when a substate is recognized for the first time.  The state will
-#### be marked as active prior to the call, which is how state_recognized can find it.
+#### state_recognized gets called when a substate is recognized for the first
+#### time.  The state will be marked as active prior to the call, which is how
+#### state_recognized can find it.
 
 sub state_recognized {
   my $self = shift;
@@ -82,8 +83,9 @@ sub state_recognized {
   die "Win32::CtrlGUI::State::multi::state_recognized is an abstract method.";
 }
 
-#### state_completed gets called when a substate is recognized for the first time.  The state will
-#### be marked as active prior to the call, which is how state_completed can find it.
+#### state_completed gets called when a substate is recognized for the first
+#### time.  The state will be marked as active prior to the call, which is how
+#### state_completed can find it.
 
 sub state_completed {
   my $self = shift;
@@ -127,7 +129,8 @@ sub is_recognized {
   }
 }
 
-#### _is_recognized tells you whether the current state (which could be one of many) is recognized
+#### _is_recognized tells you whether the current state (which could be one of
+#### many) is recognized
 
 sub _is_recognized {
   my $self = shift;
@@ -162,9 +165,6 @@ sub do_action_step {
     $self->state eq 'actn' or return 0;
 
     if ($self->_is_recognized) {
-use Data::Dumper;
-#print Data::Dumper->Dump([$self]);
-#print Data::Dumper->Dump([$self->get_states('active')]);
       $self->get_states('active')->do_action_step;
       if ($self->get_states('active')->state =~ /^done|fail$/) {
         $self->get_states('active')->{executed}++;
