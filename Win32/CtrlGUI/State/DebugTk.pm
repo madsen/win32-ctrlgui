@@ -22,10 +22,14 @@ use strict;
 package Win32::CtrlGUI::State::DebugTk;
 use vars qw($VERSION $mw $root_bookkeeper $hlist $hlist_stuff $font $statusarea $paused $pausebutton $resumebutton $debugmode);
 
-$VERSION='0.21';
+$VERSION='0.22';
 
 
 &init;
+
+=head1 NAME
+
+Win32::CtrlGUI::State::DebugTk - a Tk debugger of sorts for Win32::CtrlGUI::State
 
 =head1 Rudimentary Instructions
 

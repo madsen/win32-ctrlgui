@@ -46,7 +46,7 @@ sub _init {
       my $child = &_clean_text($self->{hlist}->info('data', $self->{hlist}->info('selection')));
       print "\natom => [criteria => [pos => \"$parent\", \"$child\"],\n         action => ''],\n\n";
     } else {
-      my $parent = &_clean_text($self->{parent});
+      my $parent = &_clean_text($self->{hlist}->info('data', $self->{hlist}->info('selection')));
       print "\natom => [criteria => [pos => \"$parent\"],\n         action => ''],\n\n";
     }
   })->pack(-side => 'left');

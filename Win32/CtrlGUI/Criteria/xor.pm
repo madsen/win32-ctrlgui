@@ -19,7 +19,7 @@ use vars qw($VERSION @ISA);
 
 @ISA = ('Win32::CtrlGUI::Criteria::multi');
 
-$VERSION='0.21';
+$VERSION='0.22';
 
 sub _is_recognized {
   my $self = shift;

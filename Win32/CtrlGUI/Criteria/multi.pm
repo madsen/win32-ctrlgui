@@ -18,7 +18,7 @@ use vars qw($VERSION @ISA);
 
 @ISA = ('Win32::CtrlGUI::Criteria');
 
-$VERSION='0.21';
+$VERSION='0.22';
 
 sub new {
   my $class = shift;
@@ -123,7 +123,7 @@ sub is_recognized {
 
   if ($self->{timeout}) {
     my $rcog = $self->_is_recognized;
-    if (ref $rcog) {
+    if (ref $rcog || $rcog) {
       if ($self->{end_time}) {
         Win32::GetTickCount() >= $self->{end_time} and return $rcog;
       } else {

@@ -1,5 +1,9 @@
 Revision history for Perl extension Win32::CtrlGUI.
 
+0.22 Tue Oct 30 2001
+	- Bugfix in Win32::CtrlGUI::Criteria::multi to deal with criteria that return booleans
+	- Added a NAME section to the POD in Win32::CtrlGUI::State::DebugTk.pm
+
 0.21 Tue Jul 24 2001
         - Update Manifest properly
         - Added support for "named" windows in atom, the Criteria, and Win32::CtrlGUI

@@ -3,7 +3,7 @@
 # Win32::CtrlGUI::State - an abstract parent class for implementing States
 #
 # Author: Toby Everett
-# Revision: 0.21
+# Revision: 0.22
 # Last Change:
 ###########################################################################
 # Copyright 2000, 2001 Toby Everett.  All rights reserved.
@@ -22,7 +22,7 @@ use strict;
 package Win32::CtrlGUI::State;
 use vars qw($VERSION $wait_intvl $action_delay $debug);
 
-$VERSION='0.21';
+$VERSION='0.22';
 
 &init;
 

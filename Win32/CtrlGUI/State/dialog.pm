@@ -17,7 +17,7 @@ use vars qw($VERSION @ISA);
 
 @ISA = ('Win32::CtrlGUI::State');
 
-$VERSION='0.21';
+$VERSION='0.22';
 
 my $dialog_name = 'dialog001';
 

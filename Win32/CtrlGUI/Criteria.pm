@@ -18,7 +18,7 @@ use vars qw($VERSION);
 use overload
   '""'  => sub {$_[0]->stringify};
 
-$VERSION='0.21';
+$VERSION='0.22';
 
 =head1 NAME
 
