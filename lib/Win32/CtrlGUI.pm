@@ -2,18 +2,15 @@
 #
 # Win32::CtrlGUI - a Module for controlling Win32 GUIs based on Win32::Setupsup
 #
-# Author: Toby Everett
-# Revision: 0.23
-# Last Change:
 ###########################################################################
-# Copyright 2000, 2001 Toby Everett.  All rights reserved.
+# Copyright 2000, 2001, 2004 Toby Ovod-Everett.  All rights reserved.
 #
 # This file is distributed under the Artistic License. See
 # http://www.ActiveState.com/corporate/artistic_license.htm or
 # the license that comes with your perl distribution.
 #
 # For comments, questions, bugs or general interest, feel free to
-# contact Toby Everett at teverett@alascom.att.com
+# contact Toby Ovod-Everett at toby@ovod-everett.org
 ##########################################################################
 use Win32::Setupsup;
 
@@ -26,7 +23,7 @@ use strict;
 package Win32::CtrlGUI;
 use vars qw($VERSION $wait_intvl);
 
-$VERSION='0.23';
+$VERSION='0.31';
 
 &init;
 
@@ -114,8 +111,8 @@ underlying call.
 =cut
 
 sub enum_windows {
-  Win32::Setupsup::EnumWindows(\my @windows) or return undef;
-  return (map {Win32::CtrlGUI::Window->_new($_)} @windows);
+	Win32::Setupsup::EnumWindows(\my @windows) or return undef;
+	return (map {Win32::CtrlGUI::Window->_new($_)} @windows);
 }
 
 =head2 wait_for_window
@@ -160,29 +157,29 @@ seconds are allowed).
 =cut
 
 sub wait_for_window {
-  my($criteria, $childcriteria, $timeout) = @_;
+	my($criteria, $childcriteria, $timeout) = @_;
 
-  $timeout = defined $timeout ? $timeout : -1;
+	$timeout = defined $timeout ? $timeout : -1;
 
-  if (!ref($criteria) && !defined($childcriteria)) {
-    while (1) {
-      my $subtime = $timeout > 10 || $timeout < 0 ? 10 : $timeout;
-      if (Win32::Setupsup::WaitForWindow($criteria, \my $window, int($subtime*1000), $wait_intvl)) {
-        return Win32::CtrlGUI::Window->_new($window);
-      }
-      $timeout -= $subtime if $timeout > 0;
-      $timeout == 0 and return undef;
-    }
-  } else {
-    my $end_time = $timeout >= 0 ? Win32::GetTickCount()+$timeout*1000 : 0;
-    while (1) {
-      my $window = &get_windows($criteria, $childcriteria, 1);
-      $window and return $window;
+	if (!ref($criteria) && !defined($childcriteria)) {
+		while (1) {
+			my $subtime = $timeout > 10 || $timeout < 0 ? 10 : $timeout;
+			if (Win32::Setupsup::WaitForWindow($criteria, \my $window, int($subtime*1000), $wait_intvl)) {
+				return Win32::CtrlGUI::Window->_new($window);
+			}
+			$timeout -= $subtime if $timeout > 0;
+			$timeout == 0 and return undef;
+		}
+	} else {
+		my $end_time = $timeout >= 0 ? Win32::GetTickCount()+$timeout*1000 : 0;
+		while (1) {
+			my $window = &get_windows($criteria, $childcriteria, 1);
+			$window and return $window;
 
-      ($end_time && $end_time <= Win32::GetTickCount()) and return undef;
-      Win32::Sleep($wait_intvl);
-    }
-  }
+			($end_time && $end_time <= Win32::GetTickCount()) and return undef;
+			Win32::Sleep($wait_intvl);
+		}
+	}
 }
 
 =head2 get_windows
@@ -196,40 +193,46 @@ of course, C<Win32::CtrlGUI::Window> objects.
 =cut
 
 sub get_windows {
-  my($criteria, $childcriteria, $justone) = @_;
+	my($criteria, $childcriteria, $justone) = @_;
 
-  my(@retval);
-  Win32::Setupsup::EnumWindows(\my @windows);
+	my(@retval);
+	Win32::Setupsup::EnumWindows(\my @windows);
 
-  foreach my $i (@windows) {
-    Win32::Setupsup::GetWindowText($i, \my $temp);
+	foreach my $i (@windows) {
+		Win32::Setupsup::GetWindowText($i, \my $temp);
 
-    my $test = 0;
-    if (ref $criteria eq 'CODE') {
-      $_ = Win32::CtrlGUI::Window->_new($i);
-      &$criteria and $test = 1;
-    } elsif (ref $criteria eq 'Regexp') {
-      $temp =~ /$criteria/ and $test = 1;
-    } elsif (ref $criteria eq 'SCALAR') {
-      $i == $Win32::CtrlGUI::Window::named_windows{${$criteria}} and $test = 1;
-    } else {
-      lc($temp) eq lc($criteria) and $test = 1;
-    }
+		my $test = 0;
+		if (ref $criteria eq 'CODE') {
+			$_ = Win32::CtrlGUI::Window->_new($i);
+			&$criteria and $test = 1;
+		} elsif (ref $criteria eq 'Regexp') {
+			$temp =~ /$criteria/ and $test = 1;
+		} elsif (ref $criteria eq 'SCALAR') {
+			$i == $Win32::CtrlGUI::Window::named_windows{${$criteria}} and $test = 1;
+		} else {
+			lc($temp) eq lc($criteria) and $test = 1;
+		}
 
-    if ($test) {
-      my $window = Win32::CtrlGUI::Window->_new($i);
-      if (!defined $childcriteria || $window->has_child($childcriteria)) {
-        $justone and return $window;
-        push(@retval, $window);
-      }
-    }
-  }
-  return @retval;
+		if ($test) {
+			my $window = Win32::CtrlGUI::Window->_new($i);
+			if (!defined $childcriteria || $window->has_child($childcriteria)) {
+				$justone and return $window;
+				push(@retval, $window);
+			}
+		}
+	}
+	return @retval;
 }
 
 sub init {
-  $wait_intvl = 100;
+	$wait_intvl = 100;
 }
 
+
+=head1 AUTHOR
+
+Toby Ovod-Everett, toby@ovod-everett.org
+
+=cut
 
 1;
