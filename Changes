@@ -17,3 +17,11 @@ Revision history for Perl extension Win32::CtrlGUI.
         - Rewrote loop support syntax (important, important)
         - Added completely new (and, I believe, superior) syntax option for
           all multi subclasses
+
+0.20  Mon Jun 18 2001
+        - Added code to Win32::CtrlGUI::Window to verify that the window
+          still exists before doing things (like sending keystrokes).
+        - Total, total refactor of the multi hierarchy.  bookkeeper implemented.
+        - Tk debugger for Win32::CtrlGUI::State written.  The killer app for
+          Win32::CtrlGUI::State now exists.  It still needs some work, but it's
+          functional enough to be of use.

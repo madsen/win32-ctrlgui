@@ -18,7 +18,7 @@ use vars qw($VERSION @ISA);
 
 @ISA = 'Win32::CtrlGUI::Criteria';
 
-$VERSION='0.10';
+$VERSION='0.20';
 
 sub new {
   my $class = shift;

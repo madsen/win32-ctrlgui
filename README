@@ -44,6 +44,11 @@ DESCRIPTION
         the demo.pl script for some ideas, and beyond that, feel free to
         contact me if you have questions.
 
+        Also, there is a Tk debugger now. It requires, of course, that Tk be
+        installed. I haven't done much testing to see how it behaves on
+        anything other than Perl 5.6.0 with Tk 800.022. Take a look at
+        demotk.pl for an example.
+
     `Win32::CtrlGUI::Criteria'
         The `Win32::CtrlGUI::Criteria' hierarchy supports the
         `Win32::CtrlGUI::State' hierarchy by providing an OO interface to
@@ -51,7 +56,10 @@ DESCRIPTION
 
   Installation instructions
 
-    `Win32::CtrlGUI' depends on `Win32::Setupsup'.
+    `Win32::CtrlGUI' depends on `Win32::Setupsup', available from
+    http://www.cpan.org/modules/by-module/Win32/setupsup.1.0.1.0.zip,
+    although you might want to check that folder to see if there is a more
+    recent version.
 
     Standard `Make::Maker' approach or just move everything in `Win32' into
     `site/lib/Win32'.

@@ -3,7 +3,7 @@
 # Win32::CtrlGUI - a Module for controlling Win32 GUIs based on Win32::Setupsup
 #
 # Author: Toby Everett
-# Revision: 0.11
+# Revision: 0.20
 # Last Change:
 ###########################################################################
 # Copyright 2000, 2001 Toby Everett.  All rights reserved.
@@ -26,7 +26,7 @@ use strict;
 package Win32::CtrlGUI;
 use vars qw($VERSION $wait_intvl);
 
-$VERSION='0.11';
+$VERSION='0.20';
 
 &init;
 
@@ -76,6 +76,10 @@ code to deal with optional windows, sequence forking, and so forth.  For now, th
 documentation.  See the demo.pl script for some ideas, and beyond that, feel free to contact me
 if you have questions.
 
+Also, there is a Tk debugger now.  It requires, of course, that Tk be installed.  I haven't done
+much testing to see how it behaves on anything other than Perl 5.6.0 with Tk 800.022.  Take a look
+at demotk.pl for an example.
+
 =item C<Win32::CtrlGUI::Criteria>
 
 The C<Win32::CtrlGUI::Criteria> hierarchy supports the C<Win32::CtrlGUI::State> hierarchy by
@@ -85,7 +89,9 @@ providing an OO interface to state criteria.
 
 =head2 Installation instructions
 
-C<Win32::CtrlGUI> depends on C<Win32::Setupsup>.
+C<Win32::CtrlGUI> depends on C<Win32::Setupsup>, available from
+http://www.cpan.org/modules/by-module/Win32/setupsup.1.0.1.0.zip, although you might want to check
+that folder to see if there is a more recent version.
 
 Standard C<Make::Maker> approach or just move everything in C<Win32> into C<site/lib/Win32>.
 

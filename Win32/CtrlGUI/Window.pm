@@ -3,8 +3,8 @@
 # Win32::CtrlGUI::Window - an OO interface for controlling Win32 GUI windows
 #
 # Author: Toby Everett
-# Revision: 0.11
-# Last Change: Discovering fallback
+# Revision: 0.20
+# Last Change: Added existence checking code throughout
 ###########################################################################
 # Copyright 2000, 2001 Toby Everett.  All rights reserved.
 #
@@ -22,7 +22,7 @@ use strict;
 package Win32::CtrlGUI::Window;
 use vars qw($VERSION %atom_map $sendkey_activate $sendkey_intvl);
 
-$VERSION='0.11';
+$VERSION='0.20';
 
 use overload
   '""'  => \&text,
@@ -47,6 +47,20 @@ Win32::CtrlGUI::Window - an OO interface for controlling Win32 GUI windows
 C<Win32::CtrlGUI::Window> objects represent GUI windows, and are used to interact with those
 windows.
 
+=head1 GLOBALS
+
+=head2 $Win32::CtrlGUI::Window::sendkey_activate
+
+I couldn't think of any reason that anyone would B<not> want to activate the window before sending
+it keys (especially given the way this OO front-end works), but if you do find yourself in that
+situation, change this to 0.
+
+=head2 $Win32::CtrlGUI::Window::sendkey_intvl
+
+This global parameter specifies the I<default> interval between keystrokes when executing a
+C<send_keys>.  The value is specified in milliseconds.  The C<send_keys> method also takes an
+optional parameter that will override this value.  The default value is 0.
+
 =head1 METHODS
 
 =head2 _new
@@ -66,22 +80,6 @@ sub _new {
   return $self;
 }
 
-=head2 text
-
-This method returns the window's text.  Rarely used because the stringification operator for
-C<Win32::CtrlGUI::Window> is overloaded to call it.  Thus, instead of writing C<print
-$window-E<gt>text,"\n";>, one can simply write C<print $window,"\n";>  If you want to print out the
-handle number, write C<print $window-E<gt>handle,"\n"> or C<print int($window),"\n">.
-
-=cut
-
-sub text {
-  my $self = shift;
-
-  Win32::Setupsup::GetWindowText($self->handle, \my $retval) or return undef;
-  return $retval;
-}
-
 =head2 handle
 
 This method returns the window's handle.  Rarely used because the numification operator for
@@ -95,7 +93,51 @@ sub handle {
   return $self->{handle};
 }
 
+=head2 text
+
+This method returns the window's text.  Rarely used because the stringification operator for
+C<Win32::CtrlGUI::Window> is overloaded to call it.  Thus, instead of writing C<print
+$window-E<gt>text,"\n";>, one can simply write C<print $window,"\n";>  If you want to print out the
+handle number, write C<print $window-E<gt>handle,"\n"> or C<print int($window),"\n">.
+
+If the window no longer exists, the method will return undef;
+
+=cut
+
+sub text {
+  my $self = shift;
+
+  $self->exists or return undef;
+  Win32::Setupsup::GetWindowText($self->handle, \my $retval) or return undef;
+  return $retval;
+}
+
+=head2 exists
+
+Calls C<Win32::Setupsup::WaitForWindowClose> with a timeout of 1ms to determine whether the window
+still exists or not.  Returns true if the C<Win32::CtrlGUI::Window> object still refers to an
+existing window, returns false if it does not.
+
+=cut
+
+sub exists {
+  my $self = shift;
+
+  Win32::Setupsup::WaitForWindowClose($self->handle, 1);
+  my $error = Win32::Setupsup::GetLastError();
+  $error == 536870926 and return 1;
+  $error == 0 and return 0;
+  die "Win32::Setupsup::GetLastError returned unknown error code in Win32::CtrlGUI::Window::exists.\n";
+}
+
 =head2 send_keys
+
+The C<send_keys> method sends keystrokes to the window.  The first parameter is the text to send.
+The second parameter is optional and specifies the interval between sending keystrokes, in
+milliseconds.
+
+If the window no longer exists, this method will die with the error
+"Win32::CtrlGUI::Window::send_keys called on non-existent window handle I<handle>."
 
 I found the C<SendKeys> syntax used by C<Win32::Setupsup> to be rather unwieldy.  I missed the
 syntax used in WinBatch, so I implemented a conversion routine.  At the same time, I extended the
@@ -192,11 +234,14 @@ sub send_keys {
 Returns a list of the window's child windows.  They are, of course, C<Win32::CtrlGUI::Window>
 objects.
 
+If the window no longer exists, the method will return undef;
+
 =cut
 
 sub enum_child_windows {
   my $self = shift;
 
+  $self->exists or return undef;
   Win32::Setupsup::EnumChildWindows($self->handle, \my @children) or return undef;
   return (map {(ref $self)->_new($_)} @children);
 }
@@ -206,12 +251,15 @@ sub enum_child_windows {
 Checks to see whether the window has a child window matching the passed criteria.  Same criteria
 options as found in C<Win32::CtrlGUI::wait_for_window>.  Returns 0 or 1.
 
+If the window no longer exists, the method will return undef;
+
 =cut
 
 sub has_child {
   my $self = shift;
   my($criteria) = @_;
 
+  $self->exists or return undef;
   Win32::Setupsup::EnumChildWindows($self->handle, \my @children) or return undef;
 
   foreach my $i (@children) {
@@ -233,11 +281,15 @@ sub has_child {
 Calls C<Win32::Setupsup::SetFocus> on the window.  See the C<Win32::Setupsup::SetFocus>
 documentation for caveats concerning this method.
 
+If the window no longer exists, this method will die with the error
+"Win32::CtrlGUI::Window::set_focus called on non-existent window handle I<handle>."
+
 =cut
 
 sub set_focus {
   my $self = shift;
 
+  $self->exists or die 'Win32::CtrlGUI::Window::set_focus called on non-existent window handle '.$self->handle.".\n";
   Win32::Setupsup::SetFocus($self->handle);
 }
 
@@ -246,25 +298,33 @@ sub set_focus {
 Calls C<Win32::Setupsup::GetWindowProperties> on the window.  Passes the list of requested
 properties and returns the list of returned values in the same order.
 
+If the window no longer exists, the method will return undef;
+
 =cut
 
 sub get_properties {
   my $self = shift;
   my(@properties) = @_;
 
+  $self->exists or return undef;
   Win32::Setupsup::GetWindowProperties($self->handle, \@properties, \my %properties) or return undef;
   return (map {$properties{$_}} @properties);
 }
 
-=head2 get_properties
+=head2 set_properties
 
 Calls C<Win32::Setupsup::SetWindowProperties> on the window.
+
+If the window no longer exists, this method will die with the error
+"Win32::CtrlGUI::Window::set_properties called on non-existent window handle I<handle>."
+
 =cut
 
 sub set_properties {
   my $self = shift;
   my(%properties) = @_;
 
+  $self->exists or die 'Win32::CtrlGUI::Window::set_properties called on non-existent window handle '.$self->handle.".\n";
   return Win32::Setupsup::SetWindowProperties($self->handle, \%properties);
 }
 
@@ -274,6 +334,7 @@ sub _send_keys {
   my $self = shift;
   my($keys, $intvl) = @_;
 
+  $self->exists or die 'Win32::CtrlGUI::Window::send_keys called on non-existent window handle '.$self->handle.".\n";
   Win32::Setupsup::SendKeys($self->handle, $keys, $sendkey_activate, defined $intvl ? $intvl : $sendkey_intvl);
 }
 

@@ -19,19 +19,35 @@ use vars qw($VERSION @ISA);
 
 @ISA = ('Win32::CtrlGUI::State::multi');
 
-$VERSION='0.11';
+$VERSION='0.20';
 
-sub _is_recognized {
+sub init {
   my $self = shift;
 
-  foreach my $i (0..$#{$self->{states}}) {
-    if ($self->{states}->[$i]->is_recognized) {
-      $self->state eq 'srch' and $self->{state} = 'rcog';
-      $self->{states} = [ @{$self->{states}}[$i..$#{$self->{states}}] ];
-      return 1;
-    }
+  foreach my $i ($self->get_states) {
+    $i->bk_set_status('pcs');
   }
-  return 0;
+}
+
+sub state_recognized {
+  my $self = shift;
+
+  foreach my $i ($self->get_states) {
+    $i->bk_status eq 'active' and last;
+    $i->bk_set_status('never');
+  }
+}
+
+sub state_completed {
+  my $self = shift;
+
+  foreach my $i ($self->get_states) {
+    if ($i->bk_status eq 'comp') {
+      $i->bk_set_status('never');
+      last;
+    }
+    $i->bk_set_status('never');
+  }
 }
 
 1;

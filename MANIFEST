@@ -10,7 +10,9 @@ Win32/CtrlGUI/Window.pm
 Win32/CtrlGUI/Criteria/arbitrary.pm
 Win32/CtrlGUI/Criteria/neg.pm
 Win32/CtrlGUI/Criteria/pos.pm
+Win32/CtrlGUI/State/DebugTk.pm
 Win32/CtrlGUI/State/atom.pm
+Win32/CtrlGUI/State/bookkeeper.pm
 Win32/CtrlGUI/State/dialog.pm
 Win32/CtrlGUI/State/fork.pm
 Win32/CtrlGUI/State/loop.pm

@@ -17,7 +17,7 @@ use vars qw($VERSION @ISA);
 
 @ISA = ('Win32::CtrlGUI::State');
 
-$VERSION='0.11';
+$VERSION='0.20';
 
 sub _new {
   my $class = shift;

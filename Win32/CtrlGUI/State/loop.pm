@@ -19,57 +19,80 @@ use vars qw($VERSION @ISA);
 
 @ISA = ('Win32::CtrlGUI::State::multi');
 
-$VERSION='0.11';
-
-sub _new {
-  my $class = shift;
-
-  my $self = $class->SUPER::_new(@_);
-
-  if (scalar(@{$self->{states}}) < 1 || scalar(@{$self->{states}}) > 2) {
-    die "$class demands a body state and, optionally, an exit_state.";
-  }
-
-  if (scalar(@{$self->{states}}) != 2 && !$self->{timeout}) {
-    die "$class demands either an exit_state or a timeout.\n";
-  }
-
-  $self->{body_state} = $self->{states}->[0];
-  scalar(@{$self->{states}}) == 2 and $self->{exit_state} = $self->{states}->[1];
-
-  return $self;
-}
+$VERSION='0.20';
 
 sub _options {
   return qw(timeout body_req);
 }
 
-sub current_state {
+sub init {
   my $self = shift;
-  return $self->{$self->{active_state}};
+
+  my $state_count = scalar($self->get_states);
+
+  if ($state_count != 1 && $state_count != 2) {
+    die "Win32::CtrlGUI::State::loop demands a body state and, optionally, an exit state.";
+  }
+
+  if ($state_count == 1 && !$self->{timeout}) {
+    die "Win32::CtrlGUI::State::loop demands either an exit state or a timeout.\n";
+  }
+
+  $self->_body->bk_set_status('pcs');
+  if ($state_count == 2) {
+    $self->_exit->bk_set_status($self->{body_req} ? 'pfs' : 'pcs');
+  }
+}
+
+sub state_recognized {
+  my $self = shift;
+  if ($self->_body->bk_status eq 'active') {
+  } else {
+    $self->_body->bk_set_status('never');
+  }
+}
+
+sub state_completed {
+  my $self = shift;
+
+  if ($self->_body->bk_status eq 'comp') {
+    $self->_body->bk_set_status('pcs');
+    $self->_body->reset;
+    $self->_exit and $self->_exit->bk_set_status('pcs');
+    $self->_set_end_time(1);
+  } else {
+    $self->_exit->bk_set_status('never');
+  }
+}
+
+sub _body {
+  my $self = shift;
+
+  return $self->{states}->[0];
+}
+
+sub _exit {
+  my $self = shift;
+
+  return $self->{states}->[1];
+}
+
+sub _set_end_time {
+  my $self = shift;
+  my($force) = @_;
+
+  if ((!$self->{end_time} || $force) && $self->{timeout}) {
+    $self->{end_time} = Win32::GetTickCount()+$self->{timeout}*1000;
+  }
 }
 
 sub _is_recognized {
   my $self = shift;
 
-  $self->{active_state} and return 1;
+  $self->_set_end_time(0);
 
-  if (!$self->{end_time} && $self->{timeout}) {
-    $self->{end_time} = Win32::GetTickCount()+$self->{timeout}*1000;
-  }
-
-  if ($self->{body_state}->is_recognized) {
-    $self->{state} = 'rcog';
-    $self->{active_state} = 'body_state';
-    $self->{body_req} = 0;
-    return 1;
-  }
-
-  if (!$self->{body_req} && $self->{exit_state}->is_recognized) {
-    $self->{state} = 'rcog';
-    $self->{active_state} = 'exit_state';
-    return 1;
-  }
+  my $retval = $self->SUPER::_is_recognized;
+  $retval and return $retval;
 
   if ($self->{end_time} && $self->{end_time} < Win32::GetTickCount()) {
     $self->{state} = 'done';
@@ -77,34 +100,6 @@ sub _is_recognized {
     return 1;
   }
   return 0;
-}
-
-sub do_action_step {
-  my $self = shift;
-
-  $self->state eq 'rcog' and $self->{state} = 'actn';
-  $self->state eq 'actn' or return 0;
-
-  while (1) {
-    if ($self->_is_recognized) {
-      $self->{state} eq 'done' and last;
-
-      $self->current_state->do_action_step;
-
-      if ($self->current_state->state =~ /^done|fail$/) {
-        if ($self->{active_state} eq 'body_state') {
-          $self->{body_state}->reset;
-          $self->{active_state} = undef;
-          $self->{end_time} = 0;
-          next;
-        } elsif ($self->{active_state} eq 'exit_state') {
-          $self->{state} = 'done';
-        }
-      }
-    }
-
-    last;
-  }
 }
 
 1;

@@ -14,11 +14,11 @@ use Win32::CtrlGUI::State;
 use strict;
 
 package Win32::CtrlGUI::State::atom;
-use vars qw($VERSION @ISA);
+use vars qw($VERSION @ISA $action_error_handler);
 
 @ISA = ('Win32::CtrlGUI::State');
 
-$VERSION='0.11';
+$VERSION='0.20';
 
 sub _new {
   my $class = shift;
@@ -70,13 +70,23 @@ sub do_action_step {
   $self->state eq 'actn' or return;
 
   if ($self->{rcog_time} + $self->action_delay * 1000 <= Win32::GetTickCount()) {
+    my $coderef;
     if (ref $self->{action} eq 'CODE') {
       $self->debug_print(1, "Executing code action.");
-      $self->{action}->($self);
+      $coderef = $self->{action};
     } elsif ($self->{action}) {
       $self->debug_print(1, "Sending keys '$self->{action}'.");
-      $self->{rcog_win}->send_keys($self->{action});
+      $coderef = sub { $_[0]->{rcog_win}->send_keys($_[0]->{action}); };
+    } else {
+      $self->debug_print(1, "No action.");
+      $coderef = sub {};
     }
+
+    eval {$coderef->($self);};
+    if ($@) {
+      $self->action_error_handler->($@);
+    }
+
     $self->debug_print(1, "");
     $self->{state} = 'done';
   }
@@ -104,6 +114,14 @@ sub reset {
   delete($self->{rcog_time});
   delete($self->{rcog_win});
   delete($self->{end_time});
+}
+
+sub action_error_handler {
+  my $self = shift;
+
+  ref($self->{action_error_handler}) eq 'CODE' and return $self->{action_error_handler};
+  ref($action_error_handler) eq 'CODE' and return $action_error_handler;
+  return sub { die $_[0]; };
 }
 
 1;

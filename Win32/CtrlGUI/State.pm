@@ -3,8 +3,8 @@
 # Win32::CtrlGUI::State - an abstract parent class for implementing States
 #
 # Author: Toby Everett
-# Revision: 0.11
-# Last Change: Total refactor of the State hierarchy
+# Revision: 0.20
+# Last Change: Second total refactor of the State hierarchy
 ###########################################################################
 # Copyright 2000, 2001 Toby Everett.  All rights reserved.
 #
@@ -22,7 +22,7 @@ use strict;
 package Win32::CtrlGUI::State;
 use vars qw($VERSION $wait_intvl $action_delay $debug);
 
-$VERSION='0.11';
+$VERSION='0.20';
 
 &init;
 
@@ -64,7 +64,8 @@ Win32::CtrlGUI::State - an OO system for controlling Win32 GUI windows through a
 
 C<Win32::CtrlGUI::State> is used to define a set of state, the desired response to those state,
 and how those states fit together so as to make it easier to control Win32 GUI windows.  Think of
-it as intelligent flow-control for Win32 GUI control.
+it as intelligent flow-control for Win32 GUI control.  Also, it lets you use a Tk debugger to
+observe your scripts as they execute.
 
 The system itself is object-oriented - there are a number of types of states, most of which accept
 a list of other states as parameters.  If you think about it, code-blocks are objects.  So are
@@ -380,6 +381,11 @@ sub wait_intvl {
 sub action_delay {
   my $self = shift;
   return defined $self->{action_delay} ? $self->{action_delay} : $action_delay;
+}
+
+sub criteria {
+  my $self = shift;
+  return $self->{criteria};
 }
 
 #### Generic Debug Code
