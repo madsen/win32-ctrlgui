@@ -1,0 +1,9 @@
+Revision history for Perl extension Win32::CtrlGUI.
+
+0.01  Wed Oct 25 2000
+        - Started work on module.
+
+0.10  Mon Jun 11 2001
+        - Added loop support.
+        - First public release.
+
