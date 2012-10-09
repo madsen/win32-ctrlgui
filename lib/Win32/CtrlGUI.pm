@@ -12,24 +12,23 @@
 # For comments, questions, bugs or general interest, feel free to
 # contact Toby Ovod-Everett at toby@ovod-everett.org
 ##########################################################################
+package Win32::CtrlGUI;
+
+use strict;
+
 use Win32::Setupsup;
 
 use Win32::CtrlGUI::Criteria;
 use Win32::CtrlGUI::State;
 use Win32::CtrlGUI::Window;
 
-use strict;
+our $wait_intvl;
 
-package Win32::CtrlGUI;
-use vars qw($VERSION $wait_intvl);
-
-$VERSION='0.31';
+# VERSION from OurPkgVersion
 
 &init;
 
-=head1 NAME
-
-Win32::CtrlGUI - a Module for controlling Win32 GUIs based on Win32::Setupsup
+#ABSTRACT: a Module for controlling Win32 GUIs based on Win32::Setupsup
 
 =head1 SYNOPSIS
 
@@ -228,6 +227,8 @@ sub init {
 	$wait_intvl = 100;
 }
 
+=for Pod::Coverage
+init
 
 =head1 AUTHOR
 

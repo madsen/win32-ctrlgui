@@ -8,6 +8,8 @@
 # For comments, questions, bugs or general interest, feel free to
 # contact Toby Ovod-Everett at toby@ovod-everett.org
 ##########################################################################
+package Win32::CtrlGUI::State::DebugTk;
+
 use Win32::CtrlGUI;
 use Win32::CtrlGUI::State;
 
@@ -19,17 +21,14 @@ use Win32::API;
 
 use strict;
 
-package Win32::CtrlGUI::State::DebugTk;
-use vars qw($VERSION $mw $root_bookkeeper $hlist $hlist_stuff $font $statusarea $paused $pausebutton $resumebutton $debugmode);
+our ($mw, $root_bookkeeper, $hlist, $hlist_stuff, $font, $statusarea,
+     $paused, $pausebutton, $resumebutton, $debugmode);
 
-$VERSION='0.31';
-
+# VERSION from OurPkgVersion
 
 &init;
 
-=head1 NAME
-
-Win32::CtrlGUI::State::DebugTk - a Tk debugger of sorts for Win32::CtrlGUI::State
+# ABSTRACT: a Tk debugger of sorts for Win32::CtrlGUI::State
 
 =head1 Rudimentary Instructions
 
@@ -284,3 +283,13 @@ sub init {
 }
 
 1;
+
+=for Pod::Coverage
+# FIXME: Should these be documented?
+add_state
+append_to_status_area
+finetime
+init
+newdo
+refresh_states
+update_status

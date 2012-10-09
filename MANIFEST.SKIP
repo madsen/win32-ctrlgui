@@ -3,6 +3,7 @@
 \bCVS\b
 ,v$
 \B\.svn\b
+^README\.md
 
 # Avoid Makemaker generated and utility files.
 \bMakefile$
@@ -11,14 +12,22 @@
 \bpm_to_blib$
 \bblibdirs$
 ^MANIFEST\.SKIP$
+^MYMETA\.
 
 # Avoid Module::Build generated and utility files.
 \bBuild$
+^Build\.bat$
 \b_build
 
 # Avoid temp and backup files.
 ~$
 \.old$
 \.bak$
+\.tmp$
 \#$
 \b\.#
+\bcjm_
+
+# Avoid Dist::Zilla config files.
+^dist\.ini$
+^tools/loom\.pl

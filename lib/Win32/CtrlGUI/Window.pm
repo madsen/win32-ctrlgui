@@ -12,15 +12,16 @@
 # For comments, questions, bugs or general interest, feel free to
 # contact Toby Ovod-Everett at toby@ovod-everett.org
 ##########################################################################
-use Win32::Setupsup;
+package Win32::CtrlGUI::Window;
 
 use strict;
 
-package Win32::CtrlGUI::Window;
-use vars qw($VERSION %atom_map $sendkey_activate $sendkey_intvl
+use Win32::Setupsup;
+
+use vars qw(%atom_map $sendkey_activate $sendkey_intvl
 						$win32api_hash $constant_hash);
 
-$VERSION='0.31';
+# VERSION from OurPkgVersion
 
 use overload
 	'""'  => \&text,
@@ -29,9 +30,7 @@ use overload
 
 &init;
 
-=head1 NAME
-
-Win32::CtrlGUI::Window - an OO interface for controlling Win32 GUI windows
+#ABSTRACT: an OO interface for controlling Win32 GUI windows
 
 =head1 SYNOPSIS
 
@@ -199,8 +198,8 @@ The special characters sendable using the curly braces are:
   !           {!}
   ^           {^}
   +           {+}
-  }           {}}
-  {           {{}
+  }           {{ "{}\}" }}
+  {           {{ "{\{}" }}
 
 If the character name is followed by a space and an integer, the key will be
 repeated that many times.  For instance, to send 15 down arrows keystrokes, use
@@ -972,5 +971,13 @@ sub init_constant_hash {
 		'LB_MSGMAX' =>               0x01A8,
 	};
 }
+
+=for Pod::Coverage
+# FIXME: Should these be documented?
+init
+init_atom_map
+init_constant_hash
+
+=cut
 
 1;

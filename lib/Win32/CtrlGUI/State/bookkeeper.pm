@@ -8,17 +8,16 @@
 # For comments, questions, bugs or general interest, feel free to
 # contact Toby Ovod-Everett at toby@ovod-everett.org
 ##########################################################################
-use Win32::CtrlGUI;
-use Win32::CtrlGUI::State;
-use Win32::CtrlGUI::State::multi;
-
-use strict;
 
 package Win32::CtrlGUI::State::bookkeeper;
-use vars qw($VERSION $AUTOLOAD);
 
-$VERSION='0.31';
+use strict;
+use 5.006;
 
+use Win32::CtrlGUI;
+use Win32::CtrlGUI::State;
+
+# VERSION from OurPkgVersion
 
 sub new {
 	my $class = shift;
@@ -104,7 +103,7 @@ sub reset {
 }
 
 sub AUTOLOAD {
-	(my $func = $AUTOLOAD) =~ s/^.*:://;
+	(my $func = our $AUTOLOAD) =~ s/^.*:://;
 
 	no strict;
 	*{$func} = $method = sub {
@@ -115,3 +114,10 @@ sub AUTOLOAD {
 }
 
 1;
+
+# No documentation:
+
+=for Pod::Coverage
+.+
+
+=cut

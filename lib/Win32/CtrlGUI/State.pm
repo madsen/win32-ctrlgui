@@ -12,20 +12,20 @@
 # For comments, questions, bugs or general interest, feel free to
 # contact Toby Ovod-Everett at toby@ovod-everett.org
 ##########################################################################
-use Win32::CtrlGUI;
+package Win32::CtrlGUI::State;
 
 use strict;
+use 5.006;
 
-package Win32::CtrlGUI::State;
-use vars qw($VERSION $wait_intvl $action_delay $debug);
+use Win32::CtrlGUI;
 
-$VERSION='0.31';
+our ($wait_intvl, $action_delay, $debug);
+
+# VERSION from OurPkgVersion
 
 &init;
 
-=head1 NAME
-
-Win32::CtrlGUI::State - an OO system for controlling Win32 GUI windows through a state machine
+#ABSTRACT: an OO system for controlling Win32 GUI windows through a state machine
 
 =head1 SYNOPSIS
 
@@ -409,6 +409,16 @@ sub init {
 	$debug = 0;
 }
 
+=for Pod::Coverage
+# FIXME: Should these be documented?
+action_delay
+criteria
+debug
+debug_print
+state
+wait_intvl
+
+=cut
 
 ###########################################################################
 # Win32::CtrlGUI::State::atom
@@ -416,7 +426,7 @@ sub init {
 
 package Win32::CtrlGUI::State::atom;
 @Win32::CtrlGUI::State::atom::ISA = ('Win32::CtrlGUI::State');
-use vars qw($action_error_handler);
+our ($action_error_handler);
 
 sub _new {
 	my $class = shift;

@@ -8,21 +8,19 @@
 # For comments, questions, bugs or general interest, feel free to
 # contact Toby Ovod-Everett at toby@ovod-everett.org
 ##########################################################################
-use Win32::CtrlGUI;
+package Win32::CtrlGUI::Criteria;
 
+use 5.006;
 use strict;
 
-package Win32::CtrlGUI::Criteria;
-use vars qw($VERSION);
+use Win32::CtrlGUI;
 
 use overload
 	'""'  => sub {$_[0]->stringify};
 
-$VERSION='0.31';
+# VERSION from OurPkgVersion
 
-=head1 NAME
-
-Win32::CtrlGUI::Criteria - an OO interface for expressing state criteria
+# ABSTRACT: an OO interface for expressing state criteria
 
 =head1 SYNOPSIS
 
@@ -142,7 +140,13 @@ sub reset {
 
 }
 
+# FIXME: Should these be documented?
 
+=for Pod::Coverage
+reset
+tagged_stringify
+
+=cut
 
 ###########################################################################
 # Win32::CtrlGUI::Criteria::arbitrary
@@ -235,11 +239,10 @@ sub is_recognized {
 ###########################################################################
 
 package Win32::CtrlGUI::Criteria::multi;
-use vars qw($VERSION @ISA);
 
-@ISA = ('Win32::CtrlGUI::Criteria');
+our @ISA = ('Win32::CtrlGUI::Criteria');
 
-$VERSION='0.31';
+# VERSION from OurPkgVersion
 
 sub new {
 	my $class = shift;
