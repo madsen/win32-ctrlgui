@@ -230,10 +230,6 @@ sub init {
 =for Pod::Coverage
 init
 
-=head1 AUTHOR
-
-Toby Ovod-Everett, toby@ovod-everett.org
-
 =cut
 
 1;

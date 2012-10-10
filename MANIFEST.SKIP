@@ -30,4 +30,4 @@
 
 # Avoid Dist::Zilla config files.
 ^dist\.ini$
-^tools/loom\.pl
+^tools/
