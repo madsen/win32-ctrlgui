@@ -22,6 +22,12 @@ use Win32::CtrlGUI::Criteria;
 use Win32::CtrlGUI::State;
 use Win32::CtrlGUI::Window;
 
+=head1 DEPENDENCIES
+
+{{$t->dependency_link('Win32::Setupsup')}}, which is available on CPAN.
+
+=cut
+
 our $wait_intvl;
 
 # VERSION from OurPkgVersion
