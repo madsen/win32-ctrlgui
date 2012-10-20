@@ -30,7 +30,7 @@ use overload
 
 &init;
 
-#ABSTRACT: an OO interface for controlling Win32 GUI windows
+#ABSTRACT: OO interface for controlling Win32 GUI windows
 
 =head1 SYNOPSIS
 

@@ -28,7 +28,7 @@ our $wait_intvl;
 
 &init;
 
-#ABSTRACT: a Module for controlling Win32 GUIs based on Win32::Setupsup
+#ABSTRACT: Remote-control Win32 GUI applications
 
 =head1 SYNOPSIS
 

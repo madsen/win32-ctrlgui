@@ -20,7 +20,7 @@ use overload
 
 # VERSION from OurPkgVersion
 
-# ABSTRACT: an OO interface for expressing state criteria
+# ABSTRACT: OO interface for expressing state criteria
 
 =head1 SYNOPSIS
 

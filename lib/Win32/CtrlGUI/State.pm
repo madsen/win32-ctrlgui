@@ -25,7 +25,7 @@ our ($wait_intvl, $action_delay, $debug);
 
 &init;
 
-#ABSTRACT: an OO system for controlling Win32 GUI windows through a state machine
+#ABSTRACT: OO system for controlling Win32 GUI windows through a state machine
 
 =head1 SYNOPSIS
 

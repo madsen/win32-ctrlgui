@@ -28,7 +28,7 @@ our ($mw, $root_bookkeeper, $hlist, $hlist_stuff, $font, $statusarea,
 
 &init;
 
-# ABSTRACT: a Tk debugger of sorts for Win32::CtrlGUI::State
+# ABSTRACT: Tk debugger of sorts for Win32::CtrlGUI::State
 
 =head1 Rudimentary Instructions
 
