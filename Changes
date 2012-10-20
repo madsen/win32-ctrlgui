@@ -1,6 +1,6 @@
 Revision history for Perl extension Win32::CtrlGUI.
 
-0.31  NOT
+0.31  October 20, 2012
   - Reduced number of files by merging Criteria and much of State
   - Build process converted to Build.PL to make for easy PPM gens
   - Now maintained by Christopher J. Madsen
