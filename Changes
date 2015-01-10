@@ -1,11 +1,14 @@
 Revision history for Perl extension Win32::CtrlGUI.
 
-0.31  October 20, 2012
+0.32  NOT
+  - release tests moved to xt/
+
+0.31  2012-10-20
   - Reduced number of files by merging Criteria and much of State
   - Build process converted to Build.PL to make for easy PPM gens
   - Now maintained by Christopher J. Madsen
 
-0.30  May 24, 2002
+0.30  2002-05-24
   - Added get_property method to Win32::CtrlGUI::Window
   - Added send_message and post_message methods to
     Win32::CtrlGUI::Window
@@ -15,11 +18,11 @@ Revision history for Perl extension Win32::CtrlGUI.
   - Added cb_get_items, cb_get_selindex, and cb_set_selindex methods
     to Win32::CtrlGUI::Window
 
-0.22  October 30, 2001
+0.22  2001-10-30
   - Bugfix in Win32::CtrlGUI::Criteria::multi to deal with criteria that return booleans
   - Added a NAME section to the POD in Win32::CtrlGUI::State::DebugTk.pm
 
-0.21  July 24, 2001
+0.21  2001-07-24
   - Update Manifest properly
   - Added support for "named" windows in atom, the Criteria, and Win32::CtrlGUI
   - Added support for aggregate criteria (and, or, xor, nand)
@@ -36,7 +39,7 @@ Revision history for Perl extension Win32::CtrlGUI.
   - Modified DebugTk to use :\t inplace of =>
   - Modified State::Dialog to use named windows (i.e. dialog001, dialog002, etc.)
 
-0.20  June 18, 2001
+0.20  2001-06-18
   - Added code to Win32::CtrlGUI::Window to verify that the window
     still exists before doing things (like sending keystrokes).
   - Total, total refactor of the multi hierarchy.  bookkeeper implemented.
@@ -44,7 +47,7 @@ Revision history for Perl extension Win32::CtrlGUI.
     Win32::CtrlGUI::State now exists.  It still needs some work, but it's
     functional enough to be of use.
 
-0.11  June 13, 2001
+0.11  2001-06-13
   - Added reset support to State hierarchy.
   - Added more debug_print statements to State hierarchy.
   - Refactored code in State::seq hierarchy
@@ -55,9 +58,9 @@ Revision history for Perl extension Win32::CtrlGUI.
   - Added completely new (and, I believe, superior) syntax option for
     all multi subclasses
 
-0.10  June 11, 2001
+0.10  2001-06-11
   - Added loop support.
   - First public release.
 
-0.01  October 25, 2000
+0.01  2000-10-25
   - Started work on module.
