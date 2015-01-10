@@ -1,6 +1,7 @@
 Revision history for Perl extension Win32::CtrlGUI.
 
-0.32  NOT
+0.32  2015-01-10
+  - no functional changes
   - release tests moved to xt/
 
 0.31  2012-10-20
